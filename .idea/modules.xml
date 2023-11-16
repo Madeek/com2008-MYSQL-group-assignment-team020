@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/com2008-MYSQL-group-assignment.iml" filepath="$PROJECT_DIR$/.idea/com2008-MYSQL-group-assignment.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MYSQL-Java Codes/mysql-connector-j-8.2.0/src/build/misc/misc.iml" filepath="$PROJECT_DIR$/MYSQL-Java Codes/mysql-connector-j-8.2.0/src/build/misc/misc.iml" />
+    </modules>
+  </component>
+</project>
