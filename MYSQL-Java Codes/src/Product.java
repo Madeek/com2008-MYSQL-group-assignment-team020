@@ -13,7 +13,6 @@ public class Product {
     private String brand;
     private double price;
     int stockQuantity;
-    private Category category;
     private static final Random RAND = new Random();
 
     public Product(String name, String brand, double price, int stockQuantity, Category category) {
@@ -69,5 +68,10 @@ public class Product {
     public int getStockQuantity() {
 
         return stockQuantity;
+    }
+
+    public void setProductId(long long1) {
+
+        productId = (int) long1;
     }
 }

@@ -37,6 +37,8 @@ public class Customer {
             System.out.println("Error creating customer: " + e.getMessage());
         }
 
+        
+
     }
 
     public void browseProducts() {

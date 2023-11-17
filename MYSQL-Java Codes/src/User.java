@@ -1,19 +1,84 @@
 import java.sql.*;
+import java.util.Random;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class User {
-
+    
+    private int userId;
+    private String role;
     private String name;
+    private String password;   
+    private static final Random RAND = new Random();
 
-    public User(String name) {
 
-        this.name = name;
+    public User(String email, String password) {
+
+        this.password = encryptPassword(password);
+        this.userId = generateUserId();
+        this.role = "Customer";
+
+        String query = "INSERT INTO User VALUES (?, ?, ?, ?)";
+
+        try {
+
+            // Connect to the database
+            Connection conn = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020", "team020",
+                    "asheet1Ie");
+
+            // Create a prepared statement
+            PreparedStatement statement = conn.prepareStatement(query);
+            statement.setInt(1, userId);
+            statement.setString(2, email);
+            statement.setString(3, this.password);
+            statement.setString(4, role);
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+
+            System.out.println("Error creating user: " + e.getMessage());
+        }
+
     }
 
+    public int generateUserId() {
 
-    public void register() {
-
-        Customer customer = new Customer(name);
+        userId = RAND.nextInt(900000) + 100000;
+        return userId;
     }
+
+    public String encryptPassword(String password) {
+    
+        try {
+            
+            // Create an instance of the MD5 hashing algorithm
+            MessageDigest md = MessageDigest.getInstance("MD5");
+
+            // Convert the password string to bytes
+            byte[] passwordBytes = password.getBytes();
+
+            // Compute the MD5 hash of the password bytes
+            byte[] hashBytes = md.digest(passwordBytes);
+
+            // Convert the hash bytes to a hexadecimal string
+            StringBuilder sb = new StringBuilder();
+            
+            for (byte b : hashBytes) {
+                
+                sb.append(String.format("%02x", b));
+            }
+
+            // Return the encrypted password as a string
+            return sb.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+    
 
     public String checkUserType( String firstName, String lastName ) {
 

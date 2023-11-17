@@ -19,6 +19,8 @@
     "java.debug.settings.onBuildFailureProceed": true,
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
-        "MYSQL-Java Codes/mysql-connector-j-8.2.0/mysql-connector-j-8.2.0.jar"
-    ]
+        "MYSQL-Java Codes/mysql-connector-j-8.2.0/mysql-connector-j-8.2.0.jar",
+        "c:\\Users\\Emmanuel\\Downloads\\spring-boot-starter-web-3.1.5.jar"
+    ],
+    "maven.view": "flat"
 }

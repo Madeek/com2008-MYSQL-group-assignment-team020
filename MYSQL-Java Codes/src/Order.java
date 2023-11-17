@@ -10,6 +10,7 @@ public class Order {
     private static final Random RAND = new Random();
 
     public Order(Customer customer, Product product, int quantity) {
+
         this.orderId = generateOrderId();
     }
 
@@ -24,18 +25,13 @@ public class Order {
     }
 
     public int getOrderId() {
+
         return orderId;
     }
 
-    /**
-     * A function that returns the current date.
-     * 
-     * @return currentDate
-     */
-    public LocalDate getDate() {
-
-        LocalDate currentDate = LocalDate.now();
-        return currentDate;
+    public int getUserId() {
+            
+        return customer.getCustomerId();
     }
 
     public Product getItem() {
@@ -45,12 +41,10 @@ public class Order {
 
     public double getTotalCost() {
 
-        double totalCost = product.getPrice() * quantity;
-        return totalCost;
+        return product.getPrice() * quantity;
     }
 
     public int getQuantity() {
-
         return quantity;
     }
 }

@@ -1,7 +1,13 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,24 +16,44 @@ import org.springframework.web.bind.annotation.*;
 
 public class ManagerController {
 
+    private static final String url = "jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020";
+    private static final String user = "team020";
+    private static final String password = "asheet1Ie";
+
     @GetMapping("/manager/view-users")
-    public String viewUsers() {
+    public List<User> getUsers() {
+        List<User> userList = new ArrayList<>();
 
-        // Code to view users
-        return "Viewing users";
+        try (Connection connection = DriverManager.getConnection(url, user, password);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM User")) {
+
+            while (resultSet.next()) {
+                User user = new User(
+                        resultSet.getString("userID"),
+                        resultSet.getString("email"),
+                        resultSet.getString("encryptedPassword"),
+                        resultSet.getString("role")
+                );
+                user.setId(resultSet.getLong("id"));
+                userList.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return userList;
     }
 
-    @PostMapping("/manager/hire-staff")
-    public String hireStaff() {
-
-        // Code to hire staff
-        return "Staff hired";
+    @PostMapping("/manager/hire")
+    public ResponseEntity<User> hire(@RequestBody User user) {
+        // Add user to database
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @DeleteMapping("/manager/fire-staff")
-    public String fireStaff() {
-
-        // Code to fire staff
-        return "Staff fired";
+    @PostMapping("/manager/fire")
+    public ResponseEntity<User> fire(@RequestBody User user) {
+        // Remove user from database
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 }
