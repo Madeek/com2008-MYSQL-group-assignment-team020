@@ -1,6 +1,4 @@
 import java.sql.Date;
-import java.time.LocalDate;
-import java.time.Month;
 
 /**
  * This is the main class of the application.
@@ -15,12 +13,15 @@ public class App {
         try {
 
             accessor.connect();
+            
+
+            User user = new User("aaavvf@gmail.com", "tterssdff", "Customer");
 
             // Create a new user with username "admin" and password "password".
-            Customer Emmanuel = new Customer("Emmanuel", "Ita", "eeeiii@gmail.com", "07055522213",
-                    Date.valueOf("2003-12-01"));
-            // Emmanuel.provideBankDetails("Mastercard", "MR E C. ITA", "12345678912345687",
-            // "08/16", "555");
+            Customer customer = new Customer("Aybike", "Koyunlu", "07055522213",
+                    Date.valueOf("2003-12-01"), user);
+            customer.provideBankDetails("Visa", "MR A B. C", "12345678912345687",
+            Date.valueOf("2016-12-01"), "555");
 
         } catch (Exception e) {
 

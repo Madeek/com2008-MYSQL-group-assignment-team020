@@ -1,7 +1,18 @@
 import java.sql.*;
+import java.sql.Date;
+
 import javax.crypto.*;
 import java.util.*;
 import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.Cipher;
+
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.KeySpec;
+
 
 /**
  * This class represents the bank details of a customer. It provides methods to
@@ -9,25 +20,26 @@ import javax.crypto.spec.SecretKeySpec;
  * security code, expiry date, and card holder name. It also generates a unique
  * bank detail ID for each instance of the class. The bank details are stored in
  * a MySQL database.
+import javax.crypto.spec.SecretKeySpec
  */
 public class BankDetails {
 
     private String cardName;
+    private static byte[] key;
+    private Date expiryDate;
     private String cardNumber;
     private String securityCode;
-    private String expiryDate;
-    private String cardHolderName;
-    private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
+    private String cardHolderName; 
+    private static SecretKeySpec secretKey;
     private static final Random RAND = new Random();
-    private static final byte[] KEY = "mySecretKey12345".getBytes();
 
-    public BankDetails(int customerId, String cardName, String cardHolderName, String cardNumber, String expiryDate,
+    public BankDetails(int customerId, String cardName, String cardHolderName, String cardNumber, Date expiryDate,
             String securityCode) {
 
         this.cardName = encrypt(cardName);
         this.cardNumber = encrypt(cardNumber);
         this.securityCode = encrypt(securityCode);
-        this.expiryDate = encrypt(expiryDate);
+        this.expiryDate = expiryDate;
         this.cardHolderName = encrypt(cardHolderName);
 
         try {
@@ -42,7 +54,7 @@ public class BankDetails {
             stmt.setString(3, this.cardName);
             stmt.setString(4, this.cardHolderName);
             stmt.setString(5, this.cardNumber);
-            stmt.setString(6, this.expiryDate);
+            stmt.setDate(6, this.expiryDate);
             stmt.setString(7, this.securityCode);
             stmt.executeUpdate();
 
@@ -65,43 +77,58 @@ public class BankDetails {
     public String getSecurityCode() {
 
         return decrypt(this.securityCode);
-    }
+    }   
 
-    private static String encrypt(String value) {
-
-        try {
-
-            SecretKeySpec key = new SecretKeySpec(KEY, ALGORITHM);
-            Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-            byte[] encryptedValue = cipher.doFinal(value.getBytes());
-            return Base64.getEncoder().encodeToString(encryptedValue);
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private static String decrypt(String encryptedValue) {
+    
+    public static void setKey() {
 
         try {
 
-            SecretKeySpec key = new SecretKeySpec(KEY, ALGORITHM);
-            Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            byte[] decryptedValue = cipher.doFinal(Base64.getDecoder().decode(encryptedValue));
-            return new String(decryptedValue);
+            SecureRandom secureRandom = new SecureRandom();
+            byte[] key = new byte[16];
+            secureRandom.nextBytes(key);
+            secretKey = new SecretKeySpec(key, "AES");
 
         } catch (Exception e) {
 
-            e.printStackTrace();
-            return null;
+            System.out.println("Error while generating key: " + e.toString());
         }
     }
 
-    private int generateBankDetailId() {
+    public static String encrypt(String strToEncrypt) {
+
+        try {
+
+            setKey();
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
+
+        } catch (Exception e) {
+
+            System.out.println("Error while encrypting: " + e.toString());
+        }
+
+        return null;
+    }
+
+    public static String decrypt(String strToDecrypt) {
+
+        try {
+
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+            return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
+            
+        } catch (Exception e) {
+            
+            System.out.println("Error while decrypting: " + e.toString());
+        }
+
+        return null;
+    }
+
+public int generateBankDetailId() {
 
         return RAND.nextInt(900000) + 100000;
     }

@@ -80,7 +80,7 @@ public class Staff {
 
         Date orderDate = Date.valueOf(LocalDate.now());
 
-        String query = "INSERT INTO Order  VALUES (?, ?, ?, ?, ?, ?)"; 
+        String query = "INSERT INTO Order VALUES (?, ?, ?, ?, ?, ?)"; 
 
         try {
 

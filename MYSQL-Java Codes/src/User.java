@@ -6,22 +6,20 @@ import java.security.NoSuchAlgorithmException;
 public class User {
     
     private int userId;
-    private String role;
-    private String name;
+    private String email;
     private String password;   
     private static final Random RAND = new Random();
 
 
-    public User(String email, String password) {
+    public User(String email, String password, String role) {
 
         this.password = encryptPassword(password);
         this.userId = generateUserId();
-        this.role = "Customer";
+        this.email = email;
 
         String query = "INSERT INTO User VALUES (?, ?, ?, ?)";
 
         try {
-
             // Connect to the database
             Connection conn = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020", "team020",
                     "asheet1Ie");
@@ -35,12 +33,10 @@ public class User {
             statement.executeUpdate();
 
         } catch (SQLException e) {
-
+            
             System.out.println("Error creating user: " + e.getMessage());
         }
-
     }
-
     public int generateUserId() {
 
         userId = RAND.nextInt(900000) + 100000;
@@ -133,6 +129,16 @@ public class User {
         }
 
         return "Error occurred while checking user type.";
+    }
+
+    public int getUserId() {
+
+        return userId;
+    }
+
+    public String getEmail() {
+
+        return email;
     }
 
 }
