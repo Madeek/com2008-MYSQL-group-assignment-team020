@@ -6,6 +6,48 @@
     "configurations": [
         {
             "type": "java",
+            "name": "UserInterface",
+            "request": "launch",
+            "mainClass": "com2008.UserInterface",
+            "projectName": "com2008-MYSQL-group-assignment_f2deea52"
+        },
+        {
+            "type": "java",
+            "name": "UserRoles",
+            "request": "launch",
+            "mainClass": "com2008.UserRoles",
+            "projectName": "com2008-MYSQL-group-assignment_f2deea52"
+        },
+        {
+            "type": "java",
+            "name": "RoleSelection",
+            "request": "launch",
+            "mainClass": "com2008.RoleSelection",
+            "projectName": "com2008-MYSQL-group-assignment_f2deea52"
+        },
+        {
+            "type": "java",
+            "name": "ConfirmOrder",
+            "request": "launch",
+            "mainClass": "com2008.ConfirmOrder",
+            "projectName": "com2008-MYSQL-group-assignment_f2deea52"
+        },
+        {
+            "type": "java",
+            "name": "LoginFrame",
+            "request": "launch",
+            "mainClass": "com2008.LoginFrame",
+            "projectName": "com2008-MYSQL-group-assignment_f2deea52"
+        },
+        {
+            "type": "java",
+            "name": "ConfirmOrder",
+            "request": "launch",
+            "mainClass": "GUI.src.com2008.ConfirmOrder",
+            "projectName": "com2008-MYSQL-group-assignment_f2deea52"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"

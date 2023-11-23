@@ -20,7 +20,8 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
         "MYSQL-Java Codes/mysql-connector-j-8.2.0/mysql-connector-j-8.2.0.jar",
-        "c:\\Users\\Emmanuel\\Downloads\\spring-boot-starter-web-3.1.5.jar"
+        "c:\\Users\\Emmanuel\\Downloads\\spring-boot-starter-web-3.1.5.jar",
+        "src/com/sheffield/mysql-connector-j-8.2.0/mysql-connector-j-8.2.0.jar"
     ],
     "maven.view": "flat"
 }
