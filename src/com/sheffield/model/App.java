@@ -18,24 +18,30 @@ public class App {
 
             accessor.connect();
 
-            Staff staff = new Staff( "Has", "RRER", "07085787213", "ttrte@gmail.com", "ssrwre", 30000, "Staff" );
-            staff.provideAddress( 5, "Balaclava Road", "Sheffield", "S3 2HD" );
-            Product product = new Product( "Scenery", "Suburu", 2345.00, 10, Product.Category.LOCOMOTIVES );
-
-            staff.viewStockData(product);
+            // Staff staff = new Staff( "Has", "RRER", "07085787213", "ttrte@gmail.com", "ssrwre", 30000, "Staff" );
+            // staff.provideAddress( 5, "Balaclava Road", "Sheffield", "S3 2HD" );
+            // staff.viewStockData(product);
             
-            // List<Product> products = new ArrayList<Product>();
-            // products.add(product);+
 
-            // List<Integer> quantities = new ArrayList<Integer>();
-            // quantities.add(15);
-
-            // Customer customer = new Customer( "John", "Jones", "jjjj@gmail.com","bbdedrr", "07500465464", Date.valueOf("2010-11-20") );
+            Customer customer = new Customer( "Lil", "T", "jd@gmail.com","fuvgjfbb", "075465464", Date.valueOf("2020-11-20") );
             // customer.browseProducts();
-            // customer.createOrder(products, quantities);
+            
+            // Product product = new Product( "Scenery", "Suburu", 2345.00, 10, Product.Category.LOCOMOTIVES );
+            // System.out.println( product.getName() );
+
+            
+            List<Product> products = new ArrayList<>();
+            products.add(new Product("Product 3", "Brand 3", 30.0, 100, Product.Category.TRACK));
+            products.add( new Product("Product 4", "Brand 4", 40.0, 100, Product.Category.CONTROLLERS));
+
+            List<Integer> quantities = new ArrayList<>();
+            quantities.add(15);
+            quantities.add(20);
+
+            customer.createOrder( products, quantities );
 
 
-        } catch (Exception e) {
+        } catch ( Exception e ) {
 
             e.printStackTrace();
 

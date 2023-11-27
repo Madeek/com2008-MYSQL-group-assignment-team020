@@ -5,7 +5,7 @@ public class Product {
 
     public enum Category {
 
-        TRAINSETS, TRAINPACKS, TRACKPACKS, LOCOMOTIVES, CARRIAGES, WAGONS, TRACK, SCENERY 
+        TRAINSETS, TRAINPACKS, TRACKPACKS, LOCOMOTIVES, CARRIAGES, WAGONS, TRACK, CONTROLLERS 
     }
 
     int stockQuantity;
@@ -15,11 +15,17 @@ public class Product {
     private int productId;
     private String productCode;
     private static final Random RAND = new Random();
+    private static final List<Integer> generatedIds = new ArrayList<>();
 
-    public Product(String name, String brand, double price, int stockQuantity, Category category) {
+    
+    public Product( String name, String brand, double price, int stockQuantity, Category category ) {
 
         this.productId = generateProductId();
         this.productCode = generateProductCode();
+        this.name = name;
+        this.brand = brand;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
         
         String query = "INSERT INTO Product VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -46,14 +52,21 @@ public class Product {
 
         } catch ( SQLException e ) {
 
-            System.out.println("Error creating customer: " + e.getMessage());
+            System.out.println( "Error creating customer: " + e.getMessage() );
         } 
     }
 
     private int generateProductId() {
 
-        productId = RAND.nextInt(900000) + 100000;
-        return productId;
+        int newId = RAND.nextInt(900000) + 100000;
+
+        if ( generatedIds.contains( newId ) ) {
+
+            newId = RAND.nextInt(900000) + 100000;
+        }
+        
+        generatedIds.add( newId );
+        return newId;
     }
 
     private String generateProductCode() {
@@ -67,6 +80,7 @@ public class Product {
         return name;
     }
 
+    
     public int getProductId() {
 
         return productId;
@@ -87,8 +101,8 @@ public class Product {
         return stockQuantity;
     }
 
-    public void setProductId(long long1) {
+    public void setProductId( long long1 ) {
 
-        productId = (int) long1;
+        productId = ( int ) long1;
     }
 }

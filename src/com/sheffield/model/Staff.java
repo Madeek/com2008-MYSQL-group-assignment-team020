@@ -2,6 +2,11 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.Locale.Category;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class Staff extends User{
 
@@ -41,8 +46,26 @@ public class Staff extends User{
             statement.setInt( 8, salary );
             statement.executeUpdate();
 
-            conn.close();
-            statement.close();
+           // Register their personal details
+           int recordId = generateRecordId();
+
+           String query2 = "INSERT INTO PersonalRecord VALUES ( ?, ?, ?, ? )";
+   
+           // Create a prepared statement to add to the PersonalRecord table
+           PreparedStatement stmt = conn.prepareStatement( query2 );
+           stmt.setInt( 1, staffId );
+           stmt.setString( 2, firstName );
+           stmt.setString( 3, lastName );
+           stmt.setInt( 4, recordId );
+   
+           // Execute the insert statements
+           stmt.executeUpdate();
+           statement.executeUpdate();
+   
+           // Close the statement and connection
+           conn.close();
+           stmt.close();  
+           statement.close();
 
         } catch ( SQLException e ) {
 
@@ -76,72 +99,89 @@ public class Staff extends User{
     }
 
 
-    public void processOrder( Order order ) {
-
-        Date orderDate = Date.valueOf( LocalDate.now() );
-        String query = "INSERT INTO Order VALUES ( ?, ?, ?, ?, ?, ? )";
-
+   public void acceptOrder( Order order ) {
+    
         try {
-            
-            // Connect to the database
-            Connection conn = DriverManager.getConnection( "jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020", "team020", "asheet1Ie" );
 
-            // Create a prepared statement
-            PreparedStatement statement = conn.prepareStatement( query );
-            statement.setInt( 1, order.getUserId() );
-            statement.setInt( 2, order.getOrderId() );
-            statement.setInt( 3, orderNumber );
-            statement.setDate( 4, orderDate );
-            statement.setDouble( 5, order.getTotalCost() );
-            statement.setString( 6, "Pending" );
+            // Connect to the database again
+            Connection conn = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020", "team020", "asheet1Ie");
+
+            // Update the status of the order to "Confirmed"
+            String updateSql = "UPDATE Order SET status = 'Confirmed' WHERE orderID = ?";
+            PreparedStatement statement = conn.prepareStatement( updateSql );
+            statement.setInt( 1, order.getOrderId() );
             statement.executeUpdate();
 
-            orderNumber++;
+            // Update the stock quantity of each product in the order
+            updateSql = "UPDATE Product SET stockQuantity = stockQuantity - ? WHERE productID = ?";
+            statement = conn.prepareStatement( updateSql );
+            statement.setInt( 1, order.getQuantity() );
+            statement.setInt( 2, order.getProduct().getProductId() );
+            statement.executeUpdate();
 
-            // Close the statement and connection
-            statement.close();
+            // Close the connection and the statement
             conn.close();
+            statement.close();
 
-            // Ask the staff if they want to process the order
-            Scanner scanner = new Scanner( System.in );
-            System.out.println( "Do you want to process the order? ( Y/N )" );
-            String choice = scanner.nextLine();
+            System.out.println("Order confirmed successfully.");
 
-            if ( choice.equalsIgnoreCase( processOrderChoice ) ) {
-                // Connect to the database again
-                conn = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020", "team020", "asheet1Ie");
+            // Create a ThreadPoolExecutor with a single thread
+            ThreadPoolExecutor executorService = new ThreadPoolExecutor(
+                1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>()
+            );
 
-                // Update the status of the order to "Processed"
-                String updateSql = "UPDATE Order SET status = 'Processed' WHERE orderID = ?";
-                statement = conn.prepareStatement( updateSql );
-                statement.setInt(1, order.getOrderId());
-                statement.executeUpdate();
+            ( ( ScheduledExecutorService ) executorService ).schedule( () -> {
 
-                // Update the stock quantity of each product in the order
-                updateSql = "UPDATE Product SET stockQuantity = stockQuantity - ? WHERE productID = ?";
-                statement = conn.prepareStatement( updateSql );
-                statement.setInt(1, order.getQuantity() );
-                statement.setInt(2, order.getProduct().getProductId() );
-                statement.executeUpdate();
+                try {
 
-                // Close the statement and connection
-                statement.close();
-                conn.close();
+                    Connection conn2 = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020", "team020", "asheet1Ie");
+                    String updateSql2 = "UPDATE Order SET status = 'Fulfilled' WHERE orderID = ?";
+                    PreparedStatement statement2 = conn2.prepareStatement(updateSql2);
+                    statement2.setInt(1, order.getOrderId());
+                    statement2.executeUpdate();
+                    conn2.close();
+                    statement2.close();
+                    System.out.println("Order fulfilled successfully.");
 
-                System.out.println("Order processed successfully.");
+                } catch (SQLException e) {
 
-            } else {
-
-                System.out.println("Order not processed.");
-            }
-
+                    System.out.println("Error fulfilling order: " + e.getMessage());
+                }                
+            }, 2, TimeUnit.HOURS);
+            
         } catch ( SQLException e ) {
 
-            System.out.println( "Error: " + e.getMessage() );
+            System.out.println( "Error processing order: " + e.getMessage() );
         }
     }
 
-    public void deleteProduct(Product product) {
+
+    public void declineOrder( Order order ) {
+    
+        try {
+
+            // Connect to the database again
+            Connection conn = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020", "team020", "asheet1Ie");
+
+            // Update the status of the order to "Processed"
+            String updateSql = "UPDATE Order SET status = 'Declined' WHERE orderID = ?";
+            PreparedStatement statement = conn.prepareStatement( updateSql );
+            statement.setInt( 1, order.getOrderId() );
+            statement.executeUpdate();
+
+            // Close the connection and the statement
+            conn.close();
+            statement.close();
+
+            System.out.println("Order was declined.");
+            
+        } catch ( SQLException e ) {
+
+            System.out.println( "Error processing order: " + e.getMessage() );
+        }
+    }
+
+    public void deleteProduct( Product product ) {
 
         try {
 

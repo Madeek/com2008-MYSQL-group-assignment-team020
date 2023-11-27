@@ -1,10 +1,8 @@
 import java.sql.*;
-import java.sql.Date;
 import java.util.*;
-
-import util.HashedPasswordGenerator;
-
+import java.sql.Date;
 import java.security.MessageDigest;
+import util.HashedPasswordGenerator;
 import java.security.NoSuchAlgorithmException;
 
 public class User {
@@ -13,46 +11,60 @@ public class User {
     private String email;         
     private String password;   
     private static final Random RAND = new Random();
+    private static final String SALT = "EncryptedString";
     private static final List<Integer> generatedIds = new ArrayList<>();
 
-    public User( String email, String password, String role ) {
+    public User(String email, String password, String role) {
 
-        this.password = encryptPassword( password );
+        this.password = encrypt(password.toCharArray());
         this.userId = generateUserId();
         this.email = email;
 
-        String query = "INSERT INTO User VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO User VALUES ( ?, ?, ?, ? )";
 
         try {
 
             // Connect to the database
-            Connection conn = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020", "team020",
-                    "asheet1Ie");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020", "team020", "asheet1Ie");
 
-            // Create a prepared statement
-            PreparedStatement statement = conn.prepareStatement( query );
-            statement.setInt(1, userId);
-            statement.setString(2, email);
-            statement.setString(3, this.password);
-            statement.setString(4, role);
-            statement.executeUpdate();
+            // Check if email already exists in the database
+            String checkQuery = "SELECT email FROM User WHERE email = ?";
+            PreparedStatement checkStatement = conn.prepareStatement( checkQuery );
+            checkStatement.setString( 1, email );
+            ResultSet checkResult = checkStatement.executeQuery();
 
-            conn.close();
-            statement.close();
+            if ( checkResult.next() ) {
 
-        } catch (SQLException e) {
-            
+                System.out.println( "Error creating user: Email is already in use" );
+
+            } else {
+
+                // Create a prepared statement
+                PreparedStatement statement = conn.prepareStatement( query );
+                statement.setInt( 1, userId );
+                statement.setString( 2, email );
+                statement.setString( 3, this.password );
+                statement.setString( 4, role );
+                statement.executeUpdate();
+
+                conn.close();
+                statement.close();
+                checkResult.close();
+            }
+
+        } catch ( SQLException e ) {
+
             System.out.println("Error creating user: " + e.getMessage());
         }
     }
 
     public int generateUserId() {
         
-        int newId = RAND.nextInt(900000) + 100000;
+        int newId = RAND.nextInt( 900000) + 100000;
 
         if ( generatedIds.contains( newId ) ) {
 
-            newId = RAND.nextInt(900000) + 100000;
+            newId = RAND.nextInt( 900000) + 100000;
         }
         
         generatedIds.add( newId );
@@ -62,39 +74,9 @@ public class User {
 
     public void provideAddress( int houseNumber, String roadName, String cityName, String postCode ) {
 
-        Address address = new Address( houseNumber, roadName, cityName, postCode);
+        Address address = new Address( houseNumber, roadName, cityName, postCode );
     }
-
-    public void register() {
-        
-        int recordId = generateRecordId();
-
-        String query = "INSERT INTO PersonalRecord VALUES (?, ?, ?, ?)";
-
-        try {
-
-            // Connect to the database
-            Connection conn = DriverManager.getConnection( "jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020", "team020", "asheet1Ie" );
-
-            // Create a prepared statement to add to the PersonalRecord table
-            PreparedStatement statement = conn.prepareStatement( query );
-            statement.setInt( 1, userId );
-            statement.setString( 2, firstName );
-            statement.setString( 3, lastName );
-            statement.setInt( 4, recordId );
-
-            // Execute the insert statements
-            statement.executeUpdate();
-
-            // Close the statement and connection
-            conn.close();
-            statement.close();
-
-        } catch ( SQLException e ) {
-
-            System.out.println( "Error creating customer: " + e.getMessage() );
-        }      
-    }
+    
    
     public void viewPersonalRecord() {
 
@@ -148,18 +130,10 @@ public class User {
                 String userId = resultSet.getString( "userId" );
                 String storedPasswordHash = resultSet.getString( "encryptedPassword" );
 
-                // Check if the account is locked
-                if ( accountLocked ) {
+                // Verify the entered password against the stored hash
+                if ( verifyPassword( password, storedPasswordHash ) ) {
 
-                    return "Account is locked. Please contact support.";
-
-                } else {
-
-                    // Verify the entered password against the stored hash
-                    if ( verifyPassword( password, storedPasswordHash ) ) {
-
-                        return "Login successful for user: " + email;
-                    }
+                    return "Login successful for user: " + email;
                 }
             }
 
@@ -190,36 +164,46 @@ public class User {
         
     }
 
-    public String encryptPassword( String password ) {
-    
+    public static String encrypt( char[] strToEncrypt ) {
+
         try {
-            
-            // Create an instance of the MD5 hashing algorithm
-            MessageDigest md = MessageDigest.getInstance( "MD5" );
 
-            // Convert the password string to bytes
-            byte[] passwordBytes = password.getBytes();
+            // Create a MessageDigest instance for SHA-256
+            MessageDigest md = MessageDigest.getInstance( "SHA-256" );
 
-            // Compute the MD5 hash of the password bytes
-            byte[] hashBytes = md.digest( passwordBytes );
+            // Concatenate the salt and password bytes
+            byte[] saltedPasswordBytes = concatenateBytes( SALT.getBytes(), new String( strToEncrypt ).getBytes() );
 
-            // Convert the hash bytes to a hexadecimal string
-            StringBuilder sb = new StringBuilder();
-            
-            for ( byte b : hashBytes ) {
-                
-                sb.append( String.format( "%02x", b ) );
+            // Update the digest with the salted password bytes
+            md.update( saltedPasswordBytes );
+
+            // Get the hashed password bytes
+            byte[] hashedPasswordBytes = md.digest();
+
+            // Convert the hashed password bytes to a hexadecimal string
+            StringBuilder hexStringBuilder = new StringBuilder();
+
+            for ( byte b : hashedPasswordBytes ) {
+
+                hexStringBuilder.append( String.format( "%02x", b ) );
             }
 
-            // Return the encrypted password as a string
-            return sb.toString();
+            return hexStringBuilder.toString();
 
         } catch ( NoSuchAlgorithmException e ) {
 
+            // Handle the exception, e.g., log it or throw a custom exception
             e.printStackTrace();
+            return null;
         }
+    }
 
-        return null;
+    public static byte[] concatenateBytes( byte[] arr1, byte[] arr2 ) {
+        
+        byte[] combined = new byte[ arr1.length + arr2.length ];
+        System.arraycopy( arr1, 0, combined, 0, arr1.length );
+        System.arraycopy( arr2, 0, combined, arr1.length, arr2.length );
+        return combined;
     }
     
 
@@ -267,7 +251,7 @@ public class User {
             // If no match is found, return "Unknown user type."
             return "Unknown user type.";
 
-        } catch ( ClassNotFoundException | SQLException e ) {
+        } catch ( SQLException e ) {
 
             e.printStackTrace();
         }

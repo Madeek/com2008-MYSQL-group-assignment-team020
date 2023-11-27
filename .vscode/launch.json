@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "HashedPasswordGenerator",
+            "request": "launch",
+            "mainClass": "util.HashedPasswordGenerator",
+            "projectName": "com2008-MYSQL-group-assignment_f2deea52"
+        },
+        {
+            "type": "java",
+            "name": "LoginFrame",
+            "request": "launch",
+            "mainClass": "views.src.com2008.LoginFrame",
+            "projectName": "com2008-MYSQL-group-assignment_f2deea52"
+        },
+        {
+            "type": "java",
             "name": "UserInterface",
             "request": "launch",
             "mainClass": "com2008.UserInterface",

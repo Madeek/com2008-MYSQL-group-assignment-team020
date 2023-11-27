@@ -20,7 +20,7 @@ public class DataAccessLayer {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020", "team020", "asheet1Ie");
 
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch ( SQLException | ClassNotFoundException e ) {
 
             e.printStackTrace();
         }
