@@ -10,30 +10,37 @@ public class Order {
 
     private int orderId;
     private int quantity;
+    private int lineNumber;
+    private int orderNumber;
     private int orderLineId;
     private Double lineCost;
     private Product product;
     private Double totalCost;
     private Customer customer;
-    private int lineNumber = 1;
-    private int orderNumber = 1;
     private static final Random RAND = new Random();
-    private static final String processOrderChoice = "Y";
     private static final List<Integer> generatedIds = new ArrayList<>();
 
 
-    public Order( int customerId, Product product, int quantity ) {
-
-        this.orderId = generateOrderId();
-        this.orderLineId  = generateOrderId();
-        this.lineCost = 0.0; 
-        this.quantity = quantity;
+    /**
+     * Represents an order made by a customer.
+     * Each order contains information such as the customer ID, product, quantity, order line ID, line cost, total cost, and order ID.
+     * The order is stored in the database and can be retrieved or modified as needed.
+     * 
+     * @param userId The ID of the user.
+     * @param product The product ordered.
+     * @param quantity The quantity of the order.
+     */
+    public Order( int userId, Product product, int quantity ) {
+        
         this.product = product;
+        this.quantity = quantity;
+        this.orderLineId  = orderId;
+        this.lineCost = getTotalCost(); 
         this.totalCost = getTotalCost();
+        this.orderId = generateOrderId();
 
         Date orderDate = Date.valueOf( LocalDate.now() );
         String query = "INSERT INTO `Order` VALUES (?, ?, ?, ?, ?, ?)";
-        String orderLineQuery = "INSERT INTO OrderLine VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
             
@@ -41,39 +48,62 @@ public class Order {
             Connection conn = DriverManager.getConnection( "jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020", "team020", "asheet1Ie" );
 
             // Create a prepared statement
-            PreparedStatement statement = conn.prepareStatement( query );
-            statement.setInt( 1, customerId );
-            statement.setInt( 2, orderId );
-            statement.setInt( 3, orderNumber );
-            statement.setDate( 4, orderDate );
-            statement.setDouble( 5, totalCost );
-            statement.setString( 6, "Pending" );
-            statement.executeUpdate();
-
-
-            // Create a prepared statement
-            PreparedStatement stmt = conn.prepareStatement( orderLineQuery );
-            stmt.setInt( 1, product.getProductId() );
+            PreparedStatement stmt = conn.prepareStatement( query );
+            stmt.setInt( 1, userId );
             stmt.setInt( 2, orderId );
-            stmt.setInt( 3, orderLineId );
-            stmt.setInt( 4, lineNumber );
-            stmt.setInt( 5, quantity );
-            stmt.setDouble( 6, lineCost );
-
+            stmt.setInt( 3, orderNumber );
+            stmt.setDate( 4, orderDate );
+            stmt.setDouble( 5, totalCost );
+            stmt.setString( 6, "Pending" );
             stmt.executeUpdate();
 
-            lineNumber++;
             orderNumber++;
 
             // Close the statement and connection
             conn.close();
             stmt.close();
-            statement.close();
+
+            // Add the order to the order line
+            addToOrderLine();
 
         } catch ( SQLException e ) {
 
             System.out.println("Error creating order: " + e.getMessage());
         }
+    }
+
+    /**
+     * Adds a new order line to the database.
+     */
+    public void addToOrderLine() {
+            
+            String query = "INSERT INTO OrderLine VALUES (?, ?, ?, ?, ?, ?)";
+    
+            try {
+    
+                // Connect to the database
+                Connection conn = DriverManager.getConnection( "jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020", "team020", "asheet1Ie" );
+    
+                // Create a prepared statement
+                PreparedStatement stmt = conn.prepareStatement( query );
+                stmt.setInt( 1, product.getProductId() );
+                stmt.setInt( 2, orderId );
+                stmt.setInt( 3, orderLineId );
+                stmt.setInt( 4, lineNumber );
+                stmt.setInt( 5, quantity );
+                stmt.setDouble( 6, lineCost );
+                stmt.executeUpdate();
+    
+                lineNumber++;
+    
+                // Close the statement and connection
+                conn.close();
+                stmt.close();
+    
+            } catch ( SQLException e ) {
+    
+                System.out.println("Error creating orderline: " + e.getMessage());
+            }
     }
 
     /**
@@ -94,28 +124,91 @@ public class Order {
         return newId;
     }
 
+    /**
+     * Returns the order ID.
+     *
+     * @return the order ID
+     */
     public int getOrderId() {
 
         return orderId;
     }
 
+    /**
+     * Returns the user ID associated with this order.
+     *
+     * @return the user ID
+     */
     public int getUserId() {
             
         return customer.getCustomerId();
     }
 
+    /**
+     * Returns the product associated with this order.
+     *
+     * @return the product associated with this order
+     */
     public Product getProduct() {
 
         return product;
     }
 
+    /**
+     * Calculates and returns the total cost of the order.
+     * The total cost is calculated by multiplying the price of the product by the quantity.
+     *
+     * @return the total cost of the order
+     */
     public double getTotalCost() {
 
         return product.getPrice() * quantity;
     }
 
+    /**
+     * Returns the quantity of the order.
+     *
+     * @return the quantity of the order
+     */
     public int getQuantity() {
         
         return quantity;
+    }
+
+    /**
+     * Sets the quantity of the order and updates the corresponding records in the database.
+     * 
+     * @param newQuantity the new quantity of the order
+     */
+    public void setQuantity(int newQuantity) {
+        this.quantity = newQuantity;
+        
+        try {
+            // Establish database connection
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/database_name", "username", "password");
+            
+            // Update quantity in Order table
+            String updateOrderQuery = "UPDATE Order SET quantity = ? WHERE orderId = ?";
+            PreparedStatement updateOrderStmt = conn.prepareStatement(updateOrderQuery);
+            updateOrderStmt.setInt(1, newQuantity);
+            updateOrderStmt.setInt(2, this.orderId);
+            updateOrderStmt.executeUpdate();
+            
+            // Update quantity in OrderLine table
+            String updateOrderLineQuery = "UPDATE OrderLine SET quantity = ? WHERE orderId = ?";
+            PreparedStatement updateOrderLineStmt = conn.prepareStatement(updateOrderLineQuery);
+            updateOrderLineStmt.setInt(1, newQuantity);
+            updateOrderLineStmt.setInt(2, this.orderId);
+            updateOrderLineStmt.executeUpdate();
+            
+            // Close database connection and statements
+            conn.close();
+            updateOrderStmt.close();
+            updateOrderLineStmt.close();
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+        }
     }
 }

@@ -9,16 +9,25 @@ public class User {
     
     private int userId;
     private String email;         
-    private String password;   
+    private String password; 
+    private String watchword;   
     private static final Random RAND = new Random();
     private static final String SALT = "EncryptedString";
     private static final List<Integer> generatedIds = new ArrayList<>();
 
-    public User(String email, String password, String role) {
+    /**
+     * Represents a user in the system.
+     *
+     * @param email The user's email address.
+     * @param password The user's password.
+     * @param role The user's role.
+     */
+    public User( String email, String password, String role ) {
 
-        this.password = encrypt(password.toCharArray());
-        this.userId = generateUserId();
         this.email = email;
+        this.watchword = password;
+        this.userId = generateUserId();
+        this.password = encrypt( password.toCharArray() );
 
         String query = "INSERT INTO User VALUES ( ?, ?, ?, ? )";
 
@@ -36,20 +45,20 @@ public class User {
             if ( checkResult.next() ) {
 
                 System.out.println( "Error creating user: Email is already in use" );
+                checkResult.close();
 
             } else {
 
                 // Create a prepared statement
-                PreparedStatement statement = conn.prepareStatement( query );
-                statement.setInt( 1, userId );
-                statement.setString( 2, email );
-                statement.setString( 3, this.password );
-                statement.setString( 4, role );
-                statement.executeUpdate();
+                PreparedStatement stmt = conn.prepareStatement( query );
+                stmt.setInt( 1, userId );
+                stmt.setString( 2, email );
+                stmt.setString( 3, this.password );
+                stmt.setString( 4, role );
+                stmt.executeUpdate();
 
                 conn.close();
-                statement.close();
-                checkResult.close();
+                stmt.close();
             }
 
         } catch ( SQLException e ) {
@@ -58,6 +67,11 @@ public class User {
         }
     }
 
+    /**
+     * Generates a unique user ID.
+     * 
+     * @return The generated user ID.
+     */
     public int generateUserId() {
         
         int newId = RAND.nextInt( 900000) + 100000;
@@ -72,12 +86,24 @@ public class User {
     }
     
 
+    /**
+     * Provides the address for the user.
+     * 
+     * @param houseNumber the house number of the address
+     * @param roadName the name of the road
+     * @param cityName the name of the city
+     * @param postCode the postal code of the address
+     */
     public void provideAddress( int houseNumber, String roadName, String cityName, String postCode ) {
 
         Address address = new Address( houseNumber, roadName, cityName, postCode );
     }
     
    
+    /**
+     * Retrieves and displays the personal record of the user from the database.
+     * The personal record includes the user ID, first name, last name, and record ID.
+     */
     public void viewPersonalRecord() {
 
         String query = "SELECT * FROM PersonalRecord WHERE userId = ?";
@@ -158,12 +184,27 @@ public class User {
         }
     }
 
+    /**
+     * Provides the bank details for the user.
+     * 
+     * @param cardName       the name of the card
+     * @param cardHolderName the name of the card holder
+     * @param cardNumber     the card number
+     * @param expiryDate     the expiry date of the card
+     * @param securityCode   the security code of the card
+     */
     public void provideBankDetails( String cardName, String cardHolderName, String cardNumber, Date expiryDate, String securityCode ) {
 
         BankDetails bankDetails = new BankDetails( this.userId, cardName, cardHolderName, cardNumber, expiryDate, securityCode );
         
     }
 
+    /**
+     * Encrypts a given string using SHA-256 hashing algorithm.
+     *
+     * @param strToEncrypt the string to be encrypted
+     * @return the encrypted string in hexadecimal format
+     */
     public static String encrypt( char[] strToEncrypt ) {
 
         try {
@@ -198,6 +239,13 @@ public class User {
         }
     }
 
+    /**
+     * Concatenates two byte arrays into a single byte array.
+     * 
+     * @param arr1 the first byte array
+     * @param arr2 the second byte array
+     * @return the combined byte array
+     */
     public static byte[] concatenateBytes( byte[] arr1, byte[] arr2 ) {
         
         byte[] combined = new byte[ arr1.length + arr2.length ];
@@ -207,6 +255,14 @@ public class User {
     }
     
 
+    /**
+     * Checks the user type based on the provided first name and last name.
+     * 
+     * @param firstName the first name of the user
+     * @param lastName the last name of the user
+     * @return a string indicating the user type ("This person is a staff member.", "This person is a customer.", "This person is a manager.", or "Unknown user type.")
+     * @throws SQLException if an error occurs while accessing the database
+     */
     public String checkUserType( String firstName, String lastName ) {
 
         try {
@@ -259,17 +315,64 @@ public class User {
         return "Error occurred while checking user type.";
     }
 
+    /**
+     * Returns the user ID.
+     *
+     * @return the user ID
+     */
     public int getUserId() {
 
         return userId;
     }
 
+    /**
+     * Returns the email address of the user.
+     *
+     * @return the email address as a String
+     */
     public String getEmail() {
 
         return email;
     }
 
+    /**
+     * Returns the password of the user.
+     *
+     * @return the password as a String
+     */
+    public String getPassword() {
+
+        return watchword;
+    }
+
+    public void positionUpdate(User user, String newRole) {
+        
+        try {
+            
+            // Connect to the database
+            Connection conn = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020", "team020", "asheet1Ie");
+
+            // Create a prepared statement
+            PreparedStatement statement = conn.prepareStatement("UPDATE User SET role = ? WHERE userId = ?");
+            statement.setString(1, newRole);
+            statement.setInt(2, user.getUserId());
+            statement.executeUpdate();
+
+            conn.close();
+            statement.close();
+
+        } catch ( SQLException e ) {
+
+            System.out.println("Error updating user position: " + e.getMessage());
+        }
+    }
+
     
+    /**
+     * Generates a unique record ID for the user.
+     * 
+     * @return The generated record ID.
+     */
     public int generateRecordId() {
 
         int newId = RAND.nextInt( 900000 ) + 100000;

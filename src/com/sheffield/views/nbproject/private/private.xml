@@ -3,12 +3,18 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/javaapplication1/RegFrame.java</file>
-            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/javaapplication1/UserInterface.java</file>
-            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/javaapplication1/ConfirmOrder.java</file>
-            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/javaapplication1/LoginFrame.java</file>
-            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/javaapplication1/UserRoles.java</file>
-            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/javaapplication1/RoleSelection.java</file>
+            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/com2008/Product.java</file>
+            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/com2008/User.java</file>
+            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/com2008/test.java</file>
+            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/com2008/ConfirmOrder.java</file>
+            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/com2008/MainFrame.java</file>
+            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/com2008/ImportProduct.java</file>
+            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/com2008/LoginFrame.java</file>
+            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/com2008/NewJFrame.java</file>
+            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/com2008/RegFrame.java</file>
+            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/com2008/UserRoles.java</file>
+            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/com2008/UserInterface.java</file>
+            <file>file:/C:/Users/leone/Documents/NetBeansProjects/JavaApplication1/src/com2008/BankDetails.java</file>
         </group>
     </open-files>
 </project-private>

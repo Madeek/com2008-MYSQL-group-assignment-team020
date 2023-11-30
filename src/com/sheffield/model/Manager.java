@@ -1,23 +1,26 @@
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.Random;
 
 public class Manager extends Staff {
 
-    private User user;
-    private Staff staff;
-    private String email;
-    private int managerId;
-    private Date hireDate;
-    private static final Random RAND = new Random();
+    private Date hireDate;   
 
 
-    public Manager( String firstName, String lastName, String phoneNumber, String email, String password, int salary) {
 
-        super(firstName, lastName, phoneNumber, email, password, salary, "Manager");
-        this.hireDate = Date.valueOf(LocalDate.now());
-        this.managerId = getUserId();
-        this.email = getEmail();
+    /**
+     * Represents a Manager in the system.
+     * Inherits from the User class and adds additional functionality specific to managers.
+     *
+     * @param firstName The manager's first name.
+     * @param lastName The manager's last name.
+     * @param phoneNumber The manager's phone number.
+     * @param email The manager's email address.
+     * @param password The manager's password.
+     */
+    public Manager( String firstName, String lastName, String phoneNumber, String email, String password ) {
+
+        super( firstName, lastName, phoneNumber, email, password, 50000, "Manager" );
+        this.hireDate = Date.valueOf( LocalDate.now() );
 
         String query = "INSERT INTO Manager VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -29,7 +32,7 @@ public class Manager extends Staff {
 
             // Create a prepared statement
             PreparedStatement statement = conn.prepareStatement(query);
-            statement.setInt(1, managerId);
+            statement.setInt(1, getUserId());
             statement.setString(2, firstName);
             statement.setString(3, lastName);
             statement.setString(4, email);
@@ -40,30 +43,68 @@ public class Manager extends Staff {
             conn.close();
             statement.close();
 
-        } catch (SQLException e) {
+        } catch ( SQLException e ) {
 
-            System.out.println("Error creating manager: " + e.getMessage());
+            System.out.println( "Error creating manager: " + e.getMessage() );
         }
     }
 
-    public int generateManagerId() {
+    /**
+     * Appoints a staff member using the information from a customer object.
+     * 
+     * @param customer the customer object containing the staff member's information
+     */
+    public void appointStaff( Customer customer ) {
 
-        managerId = RAND.nextInt(900000) + 100000;
-        return managerId;
+        String firstName = customer.getFirstName();
+        String lastName = customer.getLastName();
+        String phoneNumber = customer.getPhoneNumber();
+        String email = customer.getEmail();
+        String password = customer.getPassword();
+
+        Staff staff = new Staff( firstName, lastName, phoneNumber, email, password, 25000, "Staff" );     
     }
 
-    public void appointStaff(String firstName, String lastName, String phoneNumber, String email, int salary) {
+    /**
+     * Removes a staff member from the system.
+     * This method updates the role of the staff in the User table to "Customer" and deletes the staff from the Staff table.
+     *
+     * @param staff the staff member to be removed
+     */
+    public void removeStaff( Staff staff ) {
 
-       
+        try {
+
+            // Connect to the database
+            Connection conn = DriverManager.getConnection("jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team020",
+                    "team020",
+                    "asheet1Ie");
+
+            // Update the role of the staff in the User table to "Customer"
+            positionUpdate(staff, "Customer");
+
+            // Delete the staff from the Staff table
+            PreparedStatement stmt = conn.prepareStatement("DELETE FROM Staff WHERE staffId = ?");
+            stmt.setInt(1, staff.getUserId());
+            stmt.executeUpdate();
+
+            conn.close();
+            stmt.close();
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+        }
     }
 
-    public void removeStaff(User user) {
+    /**
+     * Promotes a staff member to a manager.
+     * 
+     * @param staff the staff member to be promoted
+     */
+    public void promoteStaff( Staff staff ) {
 
-       
-    }
-
-    public void promoteStaff(Staff staff) {
-        
-        Manager manager = new Manager(staff.getFirstName(), staff.getLastName(), staff.getEmail(), staff.getPhoneNumber());
+        positionUpdate(staff, "Manager");
+        Manager manager = new Manager( staff.getFirstName(), staff.getLastName(), staff.getPhoneNumber(), staff.getEmail(), staff.getPassword() );
     }
 }

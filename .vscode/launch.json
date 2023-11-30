@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "model.App",
+            "projectName": "com2008-MYSQL-group-assignment_f2deea52"
+        },
+        {
+            "type": "java",
+            "name": "ConfirmOrder",
+            "request": "launch",
+            "mainClass": "views.src.com2008.ConfirmOrder",
+            "projectName": "com2008-MYSQL-group-assignment_f2deea52"
+        },
+        {
+            "type": "java",
+            "name": "MainFrame",
+            "request": "launch",
+            "mainClass": "views.src.com2008.MainFrame",
+            "projectName": "com2008-MYSQL-group-assignment_f2deea52"
+        },
+        {
+            "type": "java",
             "name": "HashedPasswordGenerator",
             "request": "launch",
             "mainClass": "util.HashedPasswordGenerator",

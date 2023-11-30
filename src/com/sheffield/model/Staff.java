@@ -1,30 +1,29 @@
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.Locale.Category;
-import java.util.Scanner;
-import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class Staff extends User{
 
-    private int staffId;
     private String email;
     private Date hireDate;
-    private int orderNumber;
     private String lastName;
     private String firstName;
     private String phoneNumber;
-    private static final String processOrderChoice = "Y";
 
-
-
+    /**
+     * Represents a staff member in the system.
+     * Inherits from the User class and stores additional information such as staff ID, hire date, salary, and role.
+     */
     public Staff( String firstName, String lastName, String phoneNumber, String email, String password, int salary, String role ) {
 
         super( email,  password, role );
-        this.staffId = getUserId();
+        this.email = email;
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.phoneNumber = phoneNumber;
         this.hireDate = Date.valueOf( LocalDate.now() );
 
         String query = "INSERT INTO Staff VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -36,7 +35,7 @@ public class Staff extends User{
 
             // Create a prepared statement
             PreparedStatement statement = conn.prepareStatement( query );
-            statement.setInt( 1, this.staffId );
+            statement.setInt( 1, getUserId() );
             statement.setString( 2, firstName );
             statement.setString( 3, lastName );
             statement.setString( 4, email );
@@ -44,28 +43,27 @@ public class Staff extends User{
             statement.setDate( 6, hireDate );
             statement.setString( 7, role );
             statement.setInt( 8, salary );
+
+            // Register their personal details
+            int recordId = generateRecordId();
+
+            String query2 = "INSERT INTO PersonalRecord VALUES ( ?, ?, ?, ? )";
+   
+            // Create a prepared statement to add to the PersonalRecord table
+            PreparedStatement stmt = conn.prepareStatement( query2 );
+            stmt.setInt( 1, getUserId() );
+            stmt.setString( 2, firstName );
+            stmt.setString( 3, lastName );
+            stmt.setInt( 4, recordId );
+    
+            // Execute the insert statements
+            stmt.executeUpdate();
             statement.executeUpdate();
-
-           // Register their personal details
-           int recordId = generateRecordId();
-
-           String query2 = "INSERT INTO PersonalRecord VALUES ( ?, ?, ?, ? )";
-   
-           // Create a prepared statement to add to the PersonalRecord table
-           PreparedStatement stmt = conn.prepareStatement( query2 );
-           stmt.setInt( 1, staffId );
-           stmt.setString( 2, firstName );
-           stmt.setString( 3, lastName );
-           stmt.setInt( 4, recordId );
-   
-           // Execute the insert statements
-           stmt.executeUpdate();
-           statement.executeUpdate();
-   
-           // Close the statement and connection
-           conn.close();
-           stmt.close();  
-           statement.close();
+    
+            // Close the statement and connection
+            conn.close();
+            stmt.close();  
+            statement.close();
 
         } catch ( SQLException e ) {
 
@@ -74,6 +72,11 @@ public class Staff extends User{
     }
 
 
+    /**
+     * Displays the stock data for a given product.
+     * 
+     * @param product the product for which to view the stock data
+     */
     public void viewStockData( Product product ) {
 
         // Your code to view stock data goes here
@@ -99,6 +102,12 @@ public class Staff extends User{
     }
 
 
+/**
+ * Accepts an order and performs necessary operations such as updating the order status and stock quantity.
+ * Additionally, schedules a task to fulfill the order after a specified delay.
+ *
+ * @param order The order to be accepted.
+ */
    public void acceptOrder( Order order ) {
     
         try {
@@ -143,11 +152,11 @@ public class Staff extends User{
                     statement2.close();
                     System.out.println("Order fulfilled successfully.");
 
-                } catch (SQLException e) {
+                } catch ( SQLException e ) {
 
-                    System.out.println("Error fulfilling order: " + e.getMessage());
+                    System.out.println( "Error fulfilling order: " + e.getMessage() );
                 }                
-            }, 2, TimeUnit.HOURS);
+            }, 10, TimeUnit.SECONDS);
             
         } catch ( SQLException e ) {
 
@@ -156,6 +165,11 @@ public class Staff extends User{
     }
 
 
+    /**
+     * Declines an order by updating its status to "Declined" in the database.
+     * 
+     * @param order The order to be declined.
+     */
     public void declineOrder( Order order ) {
     
         try {
@@ -181,6 +195,11 @@ public class Staff extends User{
         }
     }
 
+    /**
+     * Deletes a product from the database.
+     *
+     * @param product the product to be deleted
+     */
     public void deleteProduct( Product product ) {
 
         try {
@@ -197,13 +216,16 @@ public class Staff extends User{
             conn.close();
             statement.close();
 
-        } catch (SQLException e) {
+        } catch ( SQLException e ) {
 
             e.printStackTrace();
         }
     }
 
 
+    /**
+     * Retrieves and displays sales information from the database.
+     */
     public void viewSales() {
 
         try {
@@ -245,6 +267,9 @@ public class Staff extends User{
     }
 
 
+    /**
+     * Retrieves and prints information about all orders from the database.
+     */
     public void browseOrder() {
 
         try {
@@ -286,30 +311,48 @@ public class Staff extends User{
     }
 
 
-    public void addProduct( String name, String brand, double price, int stockQuantity, Product.Category trainsets ) {
+    /**
+     * Adds a new product to the inventory.
+     *
+     * @param name          the name of the product
+     * @param brand         the brand of the product
+     * @param price         the price of the product
+     * @param stockQuantity the stock quantity of the product
+     * @param category      the category of the product
+     */
+    public void addProduct( String name, String brand, double price, int stockQuantity, Product.Category category ) {
 
-        Product product = new Product( name, brand, price, stockQuantity, trainsets );
+        Product product = new Product( name, brand, price, stockQuantity, category );
     }
 
 
+    /**
+     * Returns the first name of the staff member.
+     *
+     * @return the first name of the staff member
+     */
     public String getFirstName() {
 
         return firstName;
     }
 
 
+    /**
+     * Returns the last name of the staff member.
+     *
+     * @return the last name of the staff member
+     */
     public String getLastName() {
 
         return lastName;
     }
 
 
-    public String getEmail() {
-
-        return email;
-    }
-
-
+    /**
+     * Returns the phone number of the staff.
+     *
+     * @return the phone number of the staff
+     */
     public String getPhoneNumber() {
 
         return phoneNumber;

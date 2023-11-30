@@ -18,14 +18,23 @@ public class Product {
     private static final List<Integer> generatedIds = new ArrayList<>();
 
     
+    /**
+     * Represents a product in the inventory.
+     * 
+     * @param name The name of the product.
+     * @param brand The brand of the product.
+     * @param price The price of the product. 
+     * @param stockQuantity The quantity of the product.
+     * @param category The category of the product.
+     */
     public Product( String name, String brand, double price, int stockQuantity, Category category ) {
 
-        this.productId = generateProductId();
-        this.productCode = generateProductCode();
         this.name = name;
         this.brand = brand;
         this.price = price;
         this.stockQuantity = stockQuantity;
+        this.productId = generateProductId();
+        this.productCode = generateProductCode();
         
         String query = "INSERT INTO Product VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -56,6 +65,11 @@ public class Product {
         } 
     }
 
+    /**
+     * Generates a unique product ID.
+     *
+     * @return The generated product ID.
+     */
     private int generateProductId() {
 
         int newId = RAND.nextInt(900000) + 100000;
@@ -69,38 +83,73 @@ public class Product {
         return newId;
     }
 
+    /**
+     * Generates a product code by appending the product ID to the letter "P".
+     *
+     * @return the generated product code
+     */
     private String generateProductCode() {
         
         return "P" + productId;
     }
     
 
+    /**
+     * Returns the name of the product.
+     *
+     * @return the name of the product
+     */
     public String getName() {
 
         return name;
     }
 
     
+    /**
+     * Returns the product ID.
+     *
+     * @return the product ID
+     */
     public int getProductId() {
 
         return productId;
     }
 
+    /**
+     * Returns the brand of the product.
+     *
+     * @return the brand of the product
+     */
     public String getBrand() {
 
         return brand;
     }
 
+    /**
+     * Returns the price of the product.
+     *
+     * @return the price of the product
+     */
     public double getPrice() {
 
         return price;
     }
 
+    /**
+     * Returns the stock quantity of the product.
+     *
+     * @return the stock quantity of the product
+     */
     public int getStockQuantity() {
 
         return stockQuantity;
     }
 
+    /**
+     * Sets the product ID.
+     * 
+     * @param long1 the product ID as a long value
+     */
     public void setProductId( long long1 ) {
 
         productId = ( int ) long1;

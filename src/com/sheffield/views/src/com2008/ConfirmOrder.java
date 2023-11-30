@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package views.src.com2008;
+package com2008;
 
 /**
  *
@@ -13,6 +13,7 @@ public class ConfirmOrder extends javax.swing.JFrame {
     /**
      * Creates new form ConfirmOrder
      */
+    
     public ConfirmOrder() {
         initComponents();
     }
@@ -71,7 +72,7 @@ public class ConfirmOrder extends javax.swing.JFrame {
             }
         });
 
-        jButton4.setText("Subtract quantity");
+        jButton4.setText("subtract quantity");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -81,6 +82,11 @@ public class ConfirmOrder extends javax.swing.JFrame {
         jLabel1.setText("Total price: 0 £");
 
         jButton5.setText("Home");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -150,10 +156,14 @@ public class ConfirmOrder extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton5ActionPerformed
+
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
