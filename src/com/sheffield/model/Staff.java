@@ -43,26 +43,12 @@ public class Staff extends User{
             statement.setDate( 6, hireDate );
             statement.setString( 7, role );
             statement.setInt( 8, salary );
-
-            // Register their personal details
-            int recordId = generateRecordId();
-
-            String query2 = "INSERT INTO PersonalRecord VALUES ( ?, ?, ?, ? )";
-   
-            // Create a prepared statement to add to the PersonalRecord table
-            PreparedStatement stmt = conn.prepareStatement( query2 );
-            stmt.setInt( 1, getUserId() );
-            stmt.setString( 2, firstName );
-            stmt.setString( 3, lastName );
-            stmt.setInt( 4, recordId );
     
             // Execute the insert statements
-            stmt.executeUpdate();
             statement.executeUpdate();
     
             // Close the statement and connection
             conn.close();
-            stmt.close();  
             statement.close();
 
         } catch ( SQLException e ) {

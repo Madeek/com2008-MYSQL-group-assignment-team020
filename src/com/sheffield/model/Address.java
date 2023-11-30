@@ -21,10 +21,10 @@ public class Address {
         * @param cityName The name of the city.
         * @param postCode The postal code of the address.
     */
-    public Address ( int houseNumber, String roadName, String cityName, String postCode ) {
+    public Address ( int userId, int houseNumber, String roadName, String cityName, String postCode ) {
 
         this.addressId = generateAddressId();
-        String query = "INSERT INTO Address VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO Address VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
 
@@ -34,10 +34,11 @@ public class Address {
             // Create a prepared statement to add to the Customer table
             PreparedStatement statement = conn.prepareStatement( query );
             statement.setInt( 1, addressId );
-            statement.setInt( 2, houseNumber );
-            statement.setString( 3, roadName );
-            statement.setString( 4, cityName );
-            statement.setString( 5, postCode );
+            statement.setInt( 2, userId);
+            statement.setInt( 3, houseNumber );
+            statement.setString( 4, roadName );
+            statement.setString( 5, cityName );
+            statement.setString( 6, postCode );
 
             // Execute the insert statements
             statement.executeUpdate();
