@@ -96,7 +96,7 @@ public class User {
      */
     public void provideAddress( int houseNumber, String roadName, String cityName, String postCode ) {
 
-        Address address = new Address( houseNumber, roadName, cityName, postCode );
+        Address address = new Address( getUserId(), houseNumber, roadName, cityName, postCode );
     }
     
    

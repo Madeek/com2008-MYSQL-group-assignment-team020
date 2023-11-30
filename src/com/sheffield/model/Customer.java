@@ -47,25 +47,10 @@ public class Customer extends User {
             statement.setString( 5, phoneNumber );
             statement.setDate( 6, birthDate );
 
-            // Register their personal details
-            int recordId = generateRecordId();
-
-            String query2 = "INSERT INTO PersonalRecord VALUES ( ?, ?, ?, ? )";
-    
-            // Create a prepared statement to add to the PersonalRecord table
-            PreparedStatement stmt = conn.prepareStatement( query2 );
-            stmt.setInt( 1, customerId );
-            stmt.setString( 2, firstName );
-            stmt.setString( 3, lastName );
-            stmt.setInt( 4, recordId );
-    
-            // Execute the insert statements
-            stmt.executeUpdate();
             statement.executeUpdate();
     
             // Close the statement and connection
-            conn.close();
-            stmt.close();  
+            conn.close(); 
             statement.close();
 
         } catch ( SQLException e ) {
